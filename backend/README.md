@@ -1,0 +1,142 @@
+# PROJECT BACKEND  FULLSTACK - LOGIN
+
+![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)
+![Spring](https://img.shields.io/badge/spring-%236DB33F.svg?style=for-the-badge&logo=spring&logoColor=white)
+![JWT](https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens)
+
+
+
+## Dependencies
++ ✅ Create Project
++ ✅ Spring Web
++ ✅ JPA
++ ✅ Spring Boot Dev Tools
++ ✅ Spring Security
++ ✅ Lombok
+
+
+
+### H2 and JWT Dependencies
+```
+  <dependency>
+    <groupId>com.h2database</groupId>
+    <artifactId>h2</artifactId>
+    <scope>runtime</scope>
+  </dependency>
+  <dependency>
+    <groupId>com.auth0</groupId>
+    <artifactId>java-jwt</artifactId>
+    <version>4.4.0</version>
+  </dependency>
+```
+
+
+### DataBase Configurations
+```
+spring.datasource.url=jdbc:h2:mem:testdb
+spring.datasource.driver-class-name=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=
+```
+
+
++ ✅ Create User Entity
++ ✅ Create User Repository
+
+
+### Security
++ ✅ Create TokenService
++ ✅ Create SecurityFilter
++ ✅ Create SecurityFilter
++ ✅ Create CustomDetailsService
++ ✅ Create SecurityConfig
++ ✅ Create AuthController
++  Config CORS
+
+
+### CORS
+```
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+@Configuration
+public class CorsConfig implements WebMvcConfigurer {
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("http://localhost:4200")
+                .allowedMethods("GET", "POST");
+    }
+}
+```
+
+
++ Integração com o Frontend
+
+
+### login.service.ts
+```
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { LoginResponse } from '../types/login-response.type';
+import { tap } from 'rxjs';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class LoginService {
+  apiUrl: string = "http://localhost:8080/auth"
+
+  constructor(private httpClient: HttpClient) { }
+
+  login(email: string, password: string){
+    return this.httpClient.post<LoginResponse>(this.apiUrl + "/login", { email, password }).pipe(
+      tap((value) => {
+        sessionStorage.setItem("auth-token", value.token)
+        sessionStorage.setItem("username", value.name)
+      })
+    )
+  }
+
+  signup(name: string, email: string, password: string){
+    return this.httpClient.post<LoginResponse>(this.apiUrl + "/register", { name, email, password }).pipe(
+      tap((value) => {
+        sessionStorage.setItem("auth-token", value.token)
+        sessionStorage.setItem("username", value.name)
+      })
+    )
+  }
+}
+```
+
+
+### auth-guard.service.ts
+```
+import { Injectable } from '@angular/core';
+import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
+import { Observable } from 'rxjs';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthGuard implements CanActivate {
+
+  constructor(private router: Router) {}
+
+  canActivate(
+    next: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
+    const authToken = sessionStorage.getItem('auth-token');
+
+    if (authToken) {
+      return true;
+    } else {
+      this.router.navigate(['/login']);
+      return false;
+    }
+  }
+}
+```
+
