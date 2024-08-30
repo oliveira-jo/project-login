@@ -53,29 +53,41 @@ spring.datasource.password=
 + ✅ Create CustomDetailsService
 + ✅ Create SecurityConfig
 + ✅ Create AuthController
-+  Config CORS
++ ✅ Config CORS
 
 
-### CORS
-```
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+### CORS Fonfiguration
 
-@Configuration
-public class CorsConfig implements WebMvcConfigurer {
++ ✅ In the class SecurityConfig and the method securityFilterChain add
 
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins("http://localhost:4200")
-                .allowedMethods("GET", "POST");
-    }
-}
 ```
 
+.cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
-+ Integração com o Frontend
+```
+
++ ✅ In the class SecurityConfig add a new method
+```
+
+  @Bean
+  public CorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration configuration = new CorsConfiguration();
+    configuration.applyPermitDefaultValues();
+    configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"));
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", configuration);
+    return source;
+  }
+
+```
+
+
+# Dependencies Fontend (Integration)
+
++ ✅ Project generated with Angular 17
++ ✅ Development server - ng server
++ ✅ Code scaffolding - ng g c component-name
++ ✅ Features - Toast Component - npm intall ngx-toastr
 
 
 ### login.service.ts
@@ -142,9 +154,4 @@ export class AuthGuard implements CanActivate {
 }
 ```
 
-## Dependencies Fontend
 
-+ ✅ Project generated with Angular 17
-+ ✅ Development server - ng server
-+ ✅ Code scaffolding - ng g c component-name
-+ ✅ Features - Toast Component - npm intall ngx-toastr
